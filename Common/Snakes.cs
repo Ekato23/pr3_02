@@ -37,7 +37,7 @@ namespace Common
         }
 
         public List<Point> Points = new List<Point>();
-        public List<Direction> direction = Direction.Start;
+        public Direction direction = Direction.Start;
         public bool GameOver = false;
 
     }
