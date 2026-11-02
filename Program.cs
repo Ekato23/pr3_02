@@ -161,6 +161,7 @@ namespace pr3shap
 
             viewModelGamesPlayer.Points = new Snakes.Point(new Random().Next(10, 783), new Random().Next(10, 410));
             viewModelGames.Add(viewModelGamesPlayer);
+            return viewModelGames.FindIndex(x => x == viewModelGamesPlayer);
         }
     }
 }
