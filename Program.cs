@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Common;
 using Newtonsoft.Json;
@@ -162,6 +163,34 @@ namespace pr3shap
             viewModelGamesPlayer.Points = new Snakes.Point(new Random().Next(10, 783), new Random().Next(10, 410));
             viewModelGames.Add(viewModelGamesPlayer);
             return viewModelGames.FindIndex(x => x == viewModelGamesPlayer);
+        }
+
+        public static void Timer()
+        {
+
+            while (true)
+            {
+
+                Thread.Sleep(100);
+
+                List<ViewModelGames> RemoteSnakes = viewModelGames.FindAll(x => x.SnakesPlayers.GameOver);
+
+                if (RemoteSnakes.Count > 0)
+                {
+
+                    foreach (ViewModelGames DeadSnake in RemoteSnakes)
+                    {
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"Отключил пользователя: {remoteIPAddress.Find(x => x.IdSnake == DeadSnake.IdSnake).IPAddress}" +
+                            $"");
+
+                    }
+
+                }
+
+            }
+
         }
     }
 }
