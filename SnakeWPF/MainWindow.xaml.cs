@@ -1,6 +1,8 @@
 ﻿using Common;
+using Newtonsoft.Json; 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -38,12 +40,16 @@ namespace SnakeWPF
         public MainWindow()
         {
             InitializeComponent();
+            mainWindow = this;
+            OpenPage(Home);
         }
+
         public void StartReceiver()
         {
             tRec = new Thread(new ThreadStart(Receiver));
             tRec.Start();
         }
+
         public void OpenPage(Page PageOpen)
         {
             DoubleAnimation startAnimation = new DoubleAnimation();
@@ -60,6 +66,90 @@ namespace SnakeWPF
                 frame.BeginAnimation(OpacityProperty, endAnimation);
             };
             frame.BeginAnimation(OpacityProperty, startAnimation);
+        }
+
+        public void Receiver()
+        {
+            receivingUdpClient = new UdpClient(int.Parse(ViewModelUserSettings.Port));
+            IPEndPoint RemoteIpEndPoint = null;
+
+            try
+            {
+                while (true)
+                {
+                    byte[] receiveBytes = receivingUdpClient.Receive(
+                        ref RemoteIpEndPoint);
+                    string returnData = Encoding.UTF8.GetString(receiveBytes);
+
+                    if (ViewModelGames == null)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            OpenPage(Game);
+                        });
+                    }
+
+                    ViewModelGames = JsonConvert.DeserializeObject<ViewModelGames>(returnData.ToString());
+
+                    if (ViewModelGames.SnakesPlayers.GameOver)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            OpenPage(new Pages.EndGame());
+                        });
+                    }
+                    else
+                    {
+                        Game.CreateUI();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Возникло исключение: " + ex.ToString() + "\n  " + ex.Message);
+            }
+        }
+        public static void Send(string datagram)
+        {
+            UdpClient sender = new UdpClient();
+            IPEndPoint endPoint = new IPEndPoint(remoteIPAddress, remotePort);
+
+            try
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(datagram);
+                sender.Send(bytes, bytes.Length, endPoint);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Возникло исключение: " + ex.ToString() + "\n  " + ex.Message);
+            }
+            finally
+            {
+                sender.Close();
+            }
+        }
+
+        private void EventKeyUp(object sender, KeyEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(ViewModelUserSettings.IPAddress) &&
+                !string.IsNullOrEmpty(ViewModelUserSettings.Port) &&
+                (ViewModelGames != null && !ViewModelGames.SnakesPlayers.GameOver))
+            {
+                if (e.Key == Key.Up)
+                    Send($"Up|{JsonConvert.SerializeObject(ViewModelUserSettings)}");
+                else if (e.Key == Key.Down)
+                    Send($"Down|{JsonConvert.SerializeObject(ViewModelUserSettings)}");
+                else if (e.Key == Key.Left)
+                    Send($"Left|{JsonConvert.SerializeObject(ViewModelUserSettings)}");
+                else if (e.Key == Key.Right)
+                    Send($"Right|{JsonConvert.SerializeObject(ViewModelUserSettings)}");
+            }
+        }
+
+        private void QuitApplication(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            receivingUdpClient.Close();
+            tRec.Abort();
         }
     }
 }
