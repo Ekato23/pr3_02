@@ -11,6 +11,7 @@ namespace Common
 
         public class Point
         {
+           
 
             public int X { get; set; }
 
@@ -39,6 +40,7 @@ namespace Common
         public List<Point> Points = new List<Point>();
         public Direction direction = Direction.Start;
         public bool GameOver = false;
+        public int IdSnake { get; set; }
 
     }
 }
