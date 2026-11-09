@@ -12,7 +12,7 @@
         <Grid.Background>
             <ImageBrush ImageSource="/Image/gazzon.jpeg" Stretch="UniformToFill"/>
         </Grid.Background>
-        <Canvas x:Name="canvas">
-        </Canvas>
+        <Canvas x:Name="canvas" Background="Transparent" 
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
     </Grid>
 </Page>

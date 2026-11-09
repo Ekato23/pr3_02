@@ -29,6 +29,7 @@ namespace SnakeWPF.Pages
 
         public void CreateUI()
         {
+            
             Dispatcher.Invoke(() =>
             {
                 if (StepCadr == 0) StepCadr = 1;
@@ -91,7 +92,7 @@ namespace SnakeWPF.Pages
                     }
                 }
                 ImageBrush myBrush = new ImageBrush();
-                myBrush.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/Image/Apple.png"));
+                myBrush.ImageSource = new BitmapImage(new Uri("pack://application:,,,/Image/apple.jpeg"));
                 Ellipse points = new Ellipse()
                 {
                     Width = 40,
@@ -103,6 +104,8 @@ namespace SnakeWPF.Pages
                 };
                 canvas.Children.Add(points);
             });
+            
+          
         }
     }
 }
